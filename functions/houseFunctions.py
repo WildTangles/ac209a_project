@@ -103,6 +103,7 @@ def fetch_training_set(full_interest, minYear=2012):
     
     #previous winner
     #drop row if district does not exist in previous
+    #+ we're assuming that district 1 is the same shape as distict 1 from other years
     
     poll_data = pickle.load(open('Datasets/national_poll.p','rb'))
     
