@@ -1,4 +1,6 @@
-# %load functions/houseFunctions.py
+import pandas as pd
+import numpy as np
+import pickle
 '''
 Parse 1976-2016 house data from https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/IG0UN2
 
@@ -102,11 +104,22 @@ def fetch_training_set(full_interest, minYear=2012):
     #previous winner
     #drop row if district does not exist in previous
     
+    poll_data = pickle.load(open('Datasets/national_poll.p','rb'))
+    
     for year in range(minYear, max(sub_interest['year'].values)+1, 2):
         for idx, row in sub_interest.iterrows():
             if row['year'] == year:                
                 alt_idx = idx.replace(str(year), str(year-2))
                 if alt_idx in sub_interest.index:
+                    
+                    nPoll = poll_data.loc[poll_data.index == idx, 'national_poll'].values[0]
+                    nPollPrev = poll_data.loc[poll_data.index == alt_idx, 'national_poll'].values[0]
+                    
+                    sub_interest.loc[sub_interest.index == idx, 'national_poll'] = nPoll
+                    sub_interest.loc[sub_interest.index == idx, 'national_poll_prior'] = nPollPrev
+                    sub_interest.loc[sub_interest.index == idx, 'national_poll_delta_sub'] = nPoll - nPollPrev
+                    sub_interest.loc[sub_interest.index == idx, 'national_poll_delta_div'] = nPoll/nPollPrev
+                    
                     sub_interest.loc[sub_interest.index == idx, 'previous_party'] = sub_interest.loc[sub_interest.index == alt_idx, 'party'].values[0]
                     
                     if sub_interest.loc[sub_interest.index == alt_idx, 'party'].values[0] == 'democrat':
