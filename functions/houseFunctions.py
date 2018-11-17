@@ -156,6 +156,7 @@ def fetch_training_set(full_interest, minYear=2012):
                         sub_interest.loc[sub_interest.index == idx, 'prior_margin_signed_divide'] = percent_loser/percent_winner
                         #%dem - %rep
                         sub_interest.loc[sub_interest.index == idx, 'prior_margin_signed_minus'] = percent_loser - percent_winner
+
                 else:
                     #if the district does not exist in the previous election, drop that district (that row) from this year's records as well
                     sub_interest = sub_interest[sub_interest.index != idx]
@@ -168,5 +169,11 @@ def fetch_training_set(full_interest, minYear=2012):
     
     sub_interest.loc[sub_interest['previous_party'] == 'republican', 'prior_win_rep'] = 1
     sub_interest.loc[sub_interest['previous_party'] != 'republican', 'prior_win_rep'] = 0
+
+    sub_interest.loc[sub_interest['party'] == 'democrat', 'curr_win_dem'] = 1
+    sub_interest.loc[sub_interest['party'] != 'democrat', 'curr_win_dem'] = 0
+
+    sub_interest.loc[sub_interest['party'] == 'republican', 'curr_win_rep'] = 1
+    sub_interest.loc[sub_interest['party'] != 'republican', 'curr_win_rep'] = 0
     
     return sub_interest
