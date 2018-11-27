@@ -86,57 +86,99 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
         dataframe containing training data.
     '''
 
-    for df in [df1, df2]:
+    df1 = df1[['district', 'state', 'year', 'party', 'candidatevotes', 'totalvotes', 'candidate']]
+    df2 = df2[['district', 'state', 'year', 'party', 'candidatevotes', 'totalvotes', 'candidate']]
 
-        df = df[['district', 'state', 'year', 'party', 'candidatevotes', 'totalvotes', 'candidate']]
+    ########################################## ADDITIONAL CLEANING RELATED TO PARTY ##########################################
 
-        ########################################## ADDITIONAL CLEANING RELATED TO PARTY ##########################################
+    #democratic-farmer-labor -> democratic party (one entry in 2012)
+    df1.loc[df1['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
+    #tax revolt -> republican party (one entry in 2012)
+    df1.loc[df1['party'] == 'tax revolt', 'party'] = 'republican'   
+    
+    #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
+    #KS 2.0: republican (tea party)
+    #KS 3.0: republican (?)
+    #KS 4.0: republican (tea party)
+    #LA 1.0: republican (it's complicated)
+    #LA 2.0: democrat (?)
+    #LA 3.0: republican
+    #if there is a run off election, we don't include it in the data. so vote counts could be iffy (e.g. see issues with verifying LA 3.0 vote counts)
+    #winner may be in correct then if the votes are not from the run-off election, like they should be! in this case..
+    #LA 4.0: republican (tea party? maybe...)
+    #LA 5.0: republican (tea party caucus)
+    #LA 6.0: republican (tea party)
+    #MS 1.0: republican
+    #MS 2.0: democrat (??)
+    #MS 3.0: republican
+    #MS 4.0: republican
+    #ND 0.0: republican
+    #WY 0.0: republican
 
-        #democratic-farmer-labor -> democratic party (one entry in 2012)
-        df.loc[df['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
-        #tax revolt -> republican party (one entry in 2012)
-        df.loc[df['party'] == 'tax revolt', 'party'] = 'republican'   
-        
-        #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
-        #KS 2.0: republican (tea party)
-        #KS 3.0: republican (?)
-        #KS 4.0: republican (tea party)
-        #LA 1.0: republican (it's complicated)
-        #LA 2.0: democrat (?)
-        #LA 3.0: republican
-        #if there is a run off election, we don't include it in the data. so vote counts could be iffy (e.g. see issues with verifying LA 3.0 vote counts)
-        #winner may be in correct then if the votes are not from the run-off election, like they should be! in this case..
-        #LA 4.0: republican (tea party? maybe...)
-        #LA 5.0: republican (tea party caucus)
-        #LA 6.0: republican (tea party)
-        #MS 1.0: republican
-        #MS 2.0: democrat (??)
-        #MS 3.0: republican
-        #MS 4.0: republican
-        #ND 0.0: republican
-        #WY 0.0: republican
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'KS') & (df1['district'] == 1.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'KS') & (df1['district'] == 2.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'KS') & (df1['district'] == 3.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'KS') & (df1['district'] == 4.0), 'party'] = 'republican'
+    
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'LA') & (df1['district'] == 1.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'LA') & (df1['district'] == 2.0), 'party'] = 'democrat'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'LA') & (df1['district'] == 3.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'LA') & (df1['district'] == 4.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'LA') & (df1['district'] == 5.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'LA') & (df1['district'] == 6.0), 'party'] = 'republican'
+    
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'MS') & (df1['district'] == 1.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'MS') & (df1['district'] == 2.0), 'party'] = 'democrat'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'MS') & (df1['district'] == 3.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'MS') & (df1['district'] == 4.0), 'party'] = 'republican'
+    
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'ND') & (df1['district'] == 1.0), 'party'] = 'republican'
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'WY') & (df1['district'] == 1.0), 'party'] = 'republican'
 
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'KS') & (df['district'] == 1.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'KS') & (df['district'] == 2.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'KS') & (df['district'] == 3.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'KS') & (df['district'] == 4.0), 'party'] = 'republican'
-        
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'LA') & (df['district'] == 1.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'LA') & (df['district'] == 2.0), 'party'] = 'democrat'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'LA') & (df['district'] == 3.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'LA') & (df['district'] == 4.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'LA') & (df['district'] == 5.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'LA') & (df['district'] == 6.0), 'party'] = 'republican'
-        
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'MS') & (df['district'] == 1.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'MS') & (df['district'] == 2.0), 'party'] = 'democrat'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'MS') & (df['district'] == 3.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'MS') & (df['district'] == 4.0), 'party'] = 'republican'
-        
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'ND') & (df['district'] == 0.0), 'party'] = 'republican'
-        df.loc[(pd.isnull(df['party'])) & (df['state'] == 'WY') & (df['district'] == 0.0), 'party'] = 'republican'
+    #democratic-farmer-labor -> democratic party (one entry in 2012)
+    df2.loc[df2['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
+    #tax revolt -> republican party (one entry in 2012)
+    df2.loc[df2['party'] == 'tax revolt', 'party'] = 'republican'   
+    
+    #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
+    #KS 2.0: republican (tea party)
+    #KS 3.0: republican (?)
+    #KS 4.0: republican (tea party)
+    #LA 1.0: republican (it's complicated)
+    #LA 2.0: democrat (?)
+    #LA 3.0: republican
+    #if there is a run off election, we don't include it in the data. so vote counts could be iffy (e.g. see issues with verifying LA 3.0 vote counts)
+    #winner may be in correct then if the votes are not from the run-off election, like they should be! in this case..
+    #LA 4.0: republican (tea party? maybe...)
+    #LA 5.0: republican (tea party caucus)
+    #LA 6.0: republican (tea party)
+    #MS 1.0: republican
+    #MS 2.0: democrat (??)
+    #MS 3.0: republican
+    #MS 4.0: republican
+    #ND 0.0: republican
+    #WY 0.0: republican
 
-        ########################################## ADDITIONAL CLEANING RELATED TO PARTY ##########################################
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'KS') & (df2['district'] == 1.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'KS') & (df2['district'] == 2.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'KS') & (df2['district'] == 3.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'KS') & (df2['district'] == 4.0), 'party'] = 'republican'
+    
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'LA') & (df2['district'] == 1.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'LA') & (df2['district'] == 2.0), 'party'] = 'democrat'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'LA') & (df2['district'] == 3.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'LA') & (df2['district'] == 4.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'LA') & (df2['district'] == 5.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'LA') & (df2['district'] == 6.0), 'party'] = 'republican'
+    
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'MS') & (df2['district'] == 1.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'MS') & (df2['district'] == 2.0), 'party'] = 'democrat'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'MS') & (df2['district'] == 3.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'MS') & (df2['district'] == 4.0), 'party'] = 'republican'
+    
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'ND') & (df2['district'] == 1.0), 'party'] = 'republican'
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'WY') & (df2['district'] == 1.0), 'party'] = 'republican'
+
         
     ########################################## ADDITIONAL PROCESSING W. ASSUMPTIONS ##########################################
     
