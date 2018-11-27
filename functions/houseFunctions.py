@@ -160,7 +160,7 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
                     #################### POLLING FEATURES ####################
 
                     #################### PREVIOUS WINNERS ####################
-                    df1.loc[df1.index == index_t, 'previous_party'] = df1.loc[df1.index == index_t, 'party'].values[0]
+                    df1.loc[df1.index == index_t, 'previous_party'] = df1.loc[df1.index == index_tm2, 'party'].values[0]
                     #################### PREVIOUS WINNERS ####################
 
                     
