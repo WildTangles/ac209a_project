@@ -188,21 +188,22 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
         #convention: t-> current election, t-2 (tm2) -> previous election
         for index_t, row in df1.iterrows():
             if row['year'] == year:
-                index_tm2 = index_t.replace(str(year), str(year-2))
-                if index_tm2 in df1.index:
+                index_tm2 = index_t.replace(str(year), str(year))
+                index_mop = index_t.replace(str(year), str(year-2))
+                if index_mop in df1.index:
                     #a district is dropped if it does not exist in all years being processed (implictly assuming districts are the same shape across all years)
 
                     #################### POLLING FEATURES ####################
                     poll_t = poll.loc[poll.index == index_t, 'national_poll'].values[0]
-                    poll_tm2 = poll.loc[poll.index == index_tm2, 'national_poll'].values[0]
+                    # poll_tm2 = poll.loc[poll.index == index_tm2, 'national_poll'].values[0]
                     df1.loc[df1.index == index_t, 'national_poll'] = poll_t
-                    df1.loc[df1.index == index_t, 'national_poll_prev'] = poll_tm2
-                    df1.loc[df1.index == index_t, 'national_poll_delta_subtract'] = poll_t - poll_tm2
-                    df1.loc[df1.index == index_t, 'national_poll_delta_divide'] = poll_t/poll_tm2
+                    # df1.loc[df1.index == index_t, 'national_poll_prev'] = poll_tm2
+                    # df1.loc[df1.index == index_t, 'national_poll_delta_subtract'] = poll_t - poll_tm2
+                    # df1.loc[df1.index == index_t, 'national_poll_delta_divide'] = poll_t/poll_tm2
                     #################### POLLING FEATURES ####################
 
                     #################### PREVIOUS WINNERS ####################
-                    df1.loc[df1.index == index_t, 'previous_party'] = df1.loc[df1.index == index_tm2, 'party'].values[0]
+                    df1.loc[df1.index == index_t, 'previous_party'] = df1.loc[df1.index == index_mop, 'party'].values[0]
                     #################### PREVIOUS WINNERS ####################
 
                     
