@@ -183,77 +183,77 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     ########################################## ADDITIONAL PROCESSING W. ASSUMPTIONS ##########################################
     
 
-    poll = pickle.load(open('Datasets/national_poll.p', 'rb'))
-    for year in range(minYear, int(max(df1['year'].values))+1, 2):
-        #convention: t-> current election, t-2 (tm2) -> previous election
-        for index_t, row in df1.iterrows():
-            if row['year'] == year:
-                index_tm2 = index_t.replace(str(year), str(year-2))
-                if index_tm2 in df1.index:
+    # poll = pickle.load(open('Datasets/national_poll.p', 'rb'))
+    # for year in range(minYear, int(max(df1['year'].values))+1, 2):
+    #     #convention: t-> current election, t-2 (tm2) -> previous election
+    #     for index_t, row in df1.iterrows():
+    #         if row['year'] == year:
+    #             index_tm2 = index_t.replace(str(year), str(year-2))
+                #if index_tm2 in df1.index:
                     #a district is dropped if it does not exist in all years being processed (implictly assuming districts are the same shape across all years)
 
                     #################### POLLING FEATURES ####################
-                    poll_t = poll.loc[poll.index == index_t, 'national_poll'].values[0]
-                    poll_tm2 = poll.loc[poll.index == index_tm2, 'national_poll'].values[0]
-                    df1.loc[df1.index == index_t, 'national_poll'] = poll_t
-                    df1.loc[df1.index == index_t, 'national_poll_prev'] = poll_tm2
-                    df1.loc[df1.index == index_t, 'national_poll_delta_subtract'] = poll_t - poll_tm2
-                    df1.loc[df1.index == index_t, 'national_poll_delta_divide'] = poll_t/poll_tm2
+                    # poll_t = poll.loc[poll.index == index_t, 'national_poll'].values[0]
+                    # poll_tm2 = poll.loc[poll.index == index_tm2, 'national_poll'].values[0]
+                    # df1.loc[df1.index == index_t, 'national_poll'] = poll_t
+                    # df1.loc[df1.index == index_t, 'national_poll_prev'] = poll_tm2
+                    # df1.loc[df1.index == index_t, 'national_poll_delta_subtract'] = poll_t - poll_tm2
+                    # df1.loc[df1.index == index_t, 'national_poll_delta_divide'] = poll_t/poll_tm2
                     #################### POLLING FEATURES ####################
 
                     #################### PREVIOUS WINNERS ####################
-                    df1.loc[df1.index == index_t, 'previous_party'] = df1.loc[df1.index == index_tm2, 'party'].values[0]
+                    # df1.loc[df1.index == index_t, 'previous_party'] = df1.loc[df1.index == index_tm2, 'party'].values[0]
                     #################### PREVIOUS WINNERS ####################
 
                     
                     #################### MARGIN FEATURES ####################
                     #convention: when signed, always defined as dem +ve and rep -ve
-                    winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(df1.loc[df1.index == index_tm2, 'totalvotes'].values[0])
-                    loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(df2.loc[df2.index == index_tm2, 'totalvotes'].values[0])
+                    # winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(df1.loc[df1.index == index_tm2, 'totalvotes'].values[0])
+                    # loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(df2.loc[df2.index == index_tm2, 'totalvotes'].values[0])
 
-                    if winner_margin == loser_margin:
-                        #only 1 player
-                        loser_margin = 1e-10
-                    else:
-                        loser_margin = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(df2.loc[df2.index == index_tm2, 'totalvotes'].values[0])                    
-                    ### see convention for 2nd winner when only 1 player ###
+                    # if winner_margin == loser_margin:
+                    #     #only 1 player
+                    #     loser_margin = 1e-10
+                    # else:
+                    #     loser_margin = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(df2.loc[df2.index == index_tm2, 'totalvotes'].values[0])                    
+                    # ### see convention for 2nd winner when only 1 player ###
 
-                    label_dem = 'dem_win_margin_prev'
-                    label_rep = 'rep_win_margin_prev'
-                    label_sm = 'margin_signed_minus_prev'
-                    label_um = 'margin_unsigned_minus_prev'
-                    label_sd = 'margin_signed_divide_prev'
-                    label_ud = 'margin_unsigned_divide_prev'
+                    # label_dem = 'dem_win_margin_prev'
+                    # label_rep = 'rep_win_margin_prev'
+                    # label_sm = 'margin_signed_minus_prev'
+                    # label_um = 'margin_unsigned_minus_prev'
+                    # label_sd = 'margin_signed_divide_prev'
+                    # label_ud = 'margin_unsigned_divide_prev'
 
-                    if df1.loc[df1.index == index_tm2, 'party'].values[0] == 'democrat':
+                    # if df1.loc[df1.index == index_tm2, 'party'].values[0] == 'democrat':
 
-                        df1.loc[df1.index == index_t, label_dem] = winner_margin
-                        df1.loc[df1.index == index_t, label_rep] = loser_margin
+                    #     df1.loc[df1.index == index_t, label_dem] = winner_margin
+                    #     df1.loc[df1.index == index_t, label_rep] = loser_margin
 
-                        df1.loc[df1.index == index_t, label_sm] = winner_margin - loser_margin
-                        if loser_margin != 0:
-                            df1.loc[df1.index == index_t, label_sd] = winner_margin/loser_margin
-                        else:
-                            df1.loc[df1.index == index_t, label_sd] = winner_margin/(1e-10)
+                    #     df1.loc[df1.index == index_t, label_sm] = winner_margin - loser_margin
+                    #     if loser_margin != 0:
+                    #         df1.loc[df1.index == index_t, label_sd] = winner_margin/loser_margin
+                    #     else:
+                    #         df1.loc[df1.index == index_t, label_sd] = winner_margin/(1e-10)
 
-                    elif df1.loc[df1.index == index_tm2, 'party'].values[0] == 'republican':
+                    # elif df1.loc[df1.index == index_tm2, 'party'].values[0] == 'republican':
 
-                        df1.loc[df1.index == index_t, label_dem] = loser_margin
-                        df1.loc[df1.index == index_t, label_rep] = winner_margin
+                    #     df1.loc[df1.index == index_t, label_dem] = loser_margin
+                    #     df1.loc[df1.index == index_t, label_rep] = winner_margin
 
-                        df1.loc[df1.index == index_t, label_sm] = loser_margin - winner_margin
-                        if winner_margin != 0:
-                            df1.loc[df1.index == index_t, label_sd] = loser_margin/winner_margin
-                        else:
-                            df1.loc[df1.index == index_t, label_sd] = loser_margin/(1e-10)
+                    #     df1.loc[df1.index == index_t, label_sm] = loser_margin - winner_margin
+                    #     if winner_margin != 0:
+                    #         df1.loc[df1.index == index_t, label_sd] = loser_margin/winner_margin
+                    #     else:
+                    #         df1.loc[df1.index == index_t, label_sd] = loser_margin/(1e-10)
 
-                    df1.loc[df1.index == index_t, label_um] = winner_margin - loser_margin
-                    if loser_margin != 0:
-                        df1.loc[df1.index == index_t, label_ud] = winner_margin/loser_margin
-                    else:
-                        df1.loc[df1.index == index_t, label_ud] = winner_margin/(1e-10)
+                    # df1.loc[df1.index == index_t, label_um] = winner_margin - loser_margin
+                    # if loser_margin != 0:
+                    #     df1.loc[df1.index == index_t, label_ud] = winner_margin/loser_margin
+                    # else:
+                    #     df1.loc[df1.index == index_t, label_ud] = winner_margin/(1e-10)
                         
-                        #if previous winner was democrat
+                    #     #if previous winner was democrat
 
                     #################### MARGIN FEATURES ####################
 
@@ -261,19 +261,19 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
                     # incumbent? name check
                     # summary statistics for winning margins changing over time
 
-                else:
-                    df1 = df1[df1.index != index_t]
+                # else:
+                #     df1 = df1[df1.index != index_t]
 
     #trim df1 down to only 1 election before minyear
     df1 = df1[df1['year'] != minYear - 2]
 
     #################### PREVIOUS WINNER FEATURES ####################
-    df1.loc[df1['previous_party'] == 'democrat', 'dem_win_prev'] = 1
-    df1.loc[df1['previous_party'] != 'democrat', 'dem_win_prev'] = 0
+    # df1.loc[df1['previous_party'] == 'democrat', 'dem_win_prev'] = 1
+    # df1.loc[df1['previous_party'] != 'democrat', 'dem_win_prev'] = 0
 
-    df1.loc[df1['previous_party'] == 'republican', 'rep_win_prev'] = 1
-    df1.loc[df1['previous_party'] != 'republican', 'rep_win_prev'] = 0
-    #################### PREVIOUS WINNER FEATURES ####################
+    # df1.loc[df1['previous_party'] == 'republican', 'rep_win_prev'] = 1
+    # df1.loc[df1['previous_party'] != 'republican', 'rep_win_prev'] = 0
+    # #################### PREVIOUS WINNER FEATURES ####################
 
 
     #################### OBSERVED WINNER ####################
