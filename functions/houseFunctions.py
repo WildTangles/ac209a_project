@@ -233,12 +233,13 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
                     winner_totalvotes = df1.loc[df1.index == index_tm2, 'totalvotes'].values[0]
                     loser_totalvotes = df2.loc[df2.index == index_tm2, 'totalvotes'].values[0]
                     if winner_totalvotes == 0:
-                        winner_totalvotes = 1e-10
+                        winner_margin = 1
+                    else:
+                        winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(winner_totalvotes)
                     if loser_totalvotes == 0:
-                        loser_totalvotes = 1e-10
-
-                    winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(winner_totalvotes)
-                    loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(loser_totalvotes)
+                        loser_margin = 1
+                    else:
+                        loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(loser_totalvotes)
 
                     if winner_margin == loser_margin:
                         #only 1 player
