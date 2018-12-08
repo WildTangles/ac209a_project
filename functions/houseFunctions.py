@@ -94,7 +94,15 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     #democratic-farmer-labor -> democratic party (one entry in 2012)
     df1.loc[df1['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
     #tax revolt -> republican party (one entry in 2012)
-    df1.loc[df1['party'] == 'tax revolt', 'party'] = 'republican'   
+    df1.loc[df1['party'] == 'tax revolt', 'party'] = 'republican'
+
+    #no clear indication which was to cast it, go by candidates closest affiliation between democrat/republican  
+    #independent -> democrat (one entry in 2004 -- bernard sanders)
+    df1.loc[df1['party'] == 'independent', 'party'] = 'democrat' 
+    #reform -> republican (two entires in 2002, 2004 -- henry e. brown jr., 2002 -- barbara dale washer)
+    df1.loc[df1['party'] == 'reform', 'party'] = 'republican'
+    #republican/democrat -> republican (one entry in 2002) -- Don Sherwood
+    df1.loc[df1['party'] == 'republican/democrat', 'party'] = 'republican'
     
     #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
     #KS 2.0: republican (tea party)
@@ -135,10 +143,20 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'ND') & (df1['district'] == 1.0), 'party'] = 'republican'
     df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'WY') & (df1['district'] == 1.0), 'party'] = 'republican'
 
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'CO') & (df1['district'] == 6.0), 'party'] = 'republican'
+
     #democratic-farmer-labor -> democratic party (one entry in 2012)
     df2.loc[df2['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
     #tax revolt -> republican party (one entry in 2012)
     df2.loc[df2['party'] == 'tax revolt', 'party'] = 'republican'   
+    
+    #no clear indication which was to cast it, go by candidates closest affiliation between democrat/republican  
+    #independent -> democrat (one entry in 2004 -- bernard sanders)
+    df2.loc[df2['party'] == 'independent', 'party'] = 'democrat' 
+    #reform -> republican (two entires in 2002, 2004 -- henry e. brown jr., 2002 -- barbara dale washer)
+    df2.loc[df2['party'] == 'reform', 'party'] = 'republican'
+    #republican/democrat -> republican (one entry in 2002) -- Don Sherwood
+    df2.loc[df2['party'] == 'republican/democrat', 'party'] = 'republican'
     
     #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
     #KS 2.0: republican (tea party)
@@ -178,6 +196,8 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     
     df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'ND') & (df2['district'] == 1.0), 'party'] = 'republican'
     df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'WY') & (df2['district'] == 1.0), 'party'] = 'republican'
+
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'CO') & (df2['district'] == 6.0), 'party'] = 'republican'
 
         
     ########################################## ADDITIONAL PROCESSING W. ASSUMPTIONS ##########################################
