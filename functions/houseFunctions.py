@@ -34,25 +34,25 @@ def load_data(relFilePath, minYear=2010):
                 winners2_df = winners2_df.append(shard.iloc[sortedIndices[0]])
     return winners_df, winners2_df
 
-def clean_index(df, rename_only=False):
+def clean_index(df, clean_before_build=True):
     '''Performs general clean up tasks on the key columns. Generates the master key.
     arguments:
         df -- dataframe to clean up, should contain the columns 'district', 'state_po' and 'year' (pandas.dataframe)
     returns:
         dataframe with cleaned key columns and index (pandas.dataframe)
     '''
-    if not rename_only:
+    if clean_before_build:
         # drop default index
         df = df.reset_index().drop(['index','state'], axis=1)
         # rename state code
         df = df.rename(columns={'state_po' : 'state'})
-        #format year and district columns as ints
-        df = df.astype({'year': int, 'district': int})
-        #make sure all districts start with 1
-        df.loc[df['district']==0, 'district'] = 1
+    #format year and district columns as ints
+    df = df.astype({'year': int, 'district': int})
+    #make sure all districts start with 1
+    df.loc[df['district']==0, 'district'] = 1
 
     # glue together the columns to get a more descriptive index    
-    df.index = ['{0}_{1:02d}_{2}'.format(row['state'],int(row['district']),row['year']) for _,row in df.iterrows()]
+    df.index = ['{0}_{1:02d}_{2}'.format(row['state'],row['district'],row['year']) for _,row in df.iterrows()]
 
     return df
 
