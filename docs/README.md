@@ -14,8 +14,8 @@
 1. Open a terminal from the github app for `testgpages`.
 2. Copy the `notebooks` folder from `gpages` into `testgpages` (using the Finder or the terminal)
 3. Using that terminal, convert the notebooks to html: 
-   1. `jupyter nbconvert --output-dir . --to html notebooks/olives-eda.ipynb`
-   2. `jupyter nbconvert --output-dir . --to html notebooks/olives-model.ipynb`
+   1. `jupyter nbconvert --output-dir ./docs --to html notebooks/olives-eda.ipynb`
+   2. `jupyter nbconvert --output-dir ./docs --to html notebooks/olives-model.ipynb`
 4. Copy `oldondex.html` from `gpages` to `index.html` in `testgpages`. Edit to suit.
 5. Commit and push
 6. Go to the github user interface for settings and enable a website on the `master` branch of `testgpages`.
@@ -30,8 +30,8 @@ Notice that we have no navigation. We would have to build all this in by hand. A
 2. From `gpages` copy the `_layouts` folder, the `_support` folder, `index.md`, and `_config.yml`.
 3. Optionally add the `_support` folder to .gitignore so its not committed.
 4. Using the `testgpages` terminal, convert the notebooks into markdown using our custom template.
-   1. `jupyter nbconvert --output-dir . --to markdown --template _support/markdown.tpl notebooks/olives-eda.ipynb`
-   2. `jupyter nbconvert --output-dir . --to markdown --template _support/markdown.tpl notebooks/olives-model.ipynb`
+   1. `jupyter nbconvert --output-dir ./docs --to markdown --template _support/markdown.tpl notebooks/olives-eda.ipynb`
+   2. `jupyter nbconvert --output-dir ./docs --to markdown --template _support/markdown.tpl notebooks/olives-model.ipynb`
 5. Commit and push and go to the website in a bit to see the changes we have got. Its much better already.
 6. Add **YAML** preambles and some TOC frontmatter to our markdown files
    1. `python _support/nbmd.py olives-eda.md` 
