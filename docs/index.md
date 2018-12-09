@@ -1,5 +1,6 @@
 ---
-title: The Case of the Italian Olives
+title: Intro
+nav_include: 1
 ---
 
 This is the home page
