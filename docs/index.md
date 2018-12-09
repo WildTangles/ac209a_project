@@ -3,7 +3,7 @@ title: Intro
 nav_include: 1
 ---
 
-This is the home page
+This is the home page.
 
 ## Lets have fun
 
