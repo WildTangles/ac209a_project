@@ -34,18 +34,18 @@ def load_data(relFilePath, minYear=2010):
                 winners2_df = winners2_df.append(shard.iloc[sortedIndices[0]])
     return winners_df, winners2_df
 
-def clean_index(df):
+def clean_index(df, clean_before_build=True):
     '''Performs general clean up tasks on the key columns. Generates the master key.
     arguments:
         df -- dataframe to clean up, should contain the columns 'district', 'state_po' and 'year' (pandas.dataframe)
     returns:
         dataframe with cleaned key columns and index (pandas.dataframe)
     '''
-
-    # drop default index
-    df = df.reset_index().drop(['index','state'], axis=1)
-    # rename state code
-    df = df.rename(columns={'state_po' : 'state'})
+    if clean_before_build:
+        # drop default index
+        df = df.reset_index().drop(['index','state'], axis=1)
+        # rename state code
+        df = df.rename(columns={'state_po' : 'state'})
     #format year and district columns as ints
     df = df.astype({'year': int, 'district': int})
     #make sure all districts start with 1
@@ -56,7 +56,7 @@ def clean_index(df):
 
     return df
 
-def fetch_index(df, save=False, load=False):
+def fetch_index(df, df2, save=False, load=False):
     '''Helper function for generating/loading master index for syncing between data sources.
     arguments:
         df -- dataframe to parse index from, MUST CONTAIN FULL COPIES OF THE 'district', 'state_po', 'year' COLUMNS (pandas.dataframe)
@@ -66,7 +66,9 @@ def fetch_index(df, save=False, load=False):
 
     if not load:
         # Make a dummy dataframe so everyone else can make complete dataframes
-        master_index = df[['district','state','year']]
+        tmp1 = df[['district', 'state', 'year']]
+        tmp2 = df2[['district', 'state', 'year']]
+        master_index = pd.concat([tmp1, tmp2])
 
         if save:
             pickle.dump(master_index, open('Datasets/master_index.p', 'wb'))
@@ -94,7 +96,15 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     #democratic-farmer-labor -> democratic party (one entry in 2012)
     df1.loc[df1['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
     #tax revolt -> republican party (one entry in 2012)
-    df1.loc[df1['party'] == 'tax revolt', 'party'] = 'republican'   
+    df1.loc[df1['party'] == 'tax revolt', 'party'] = 'republican'
+
+    #no clear indication which was to cast it, go by candidates closest affiliation between democrat/republican  
+    #independent -> democrat (one entry in 2004 -- bernard sanders)
+    df1.loc[df1['party'] == 'independent', 'party'] = 'democrat' 
+    #reform -> republican (two entires in 2002, 2004 -- henry e. brown jr., 2002 -- barbara dale washer)
+    df1.loc[df1['party'] == 'reform', 'party'] = 'republican'
+    #republican/democrat -> republican (one entry in 2002) -- Don Sherwood
+    df1.loc[df1['party'] == 'republican/democrat', 'party'] = 'republican'
     
     #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
     #KS 2.0: republican (tea party)
@@ -135,10 +145,20 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'ND') & (df1['district'] == 1.0), 'party'] = 'republican'
     df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'WY') & (df1['district'] == 1.0), 'party'] = 'republican'
 
+    df1.loc[(pd.isnull(df1['party'])) & (df1['state'] == 'CO') & (df1['district'] == 6.0), 'party'] = 'republican'
+
     #democratic-farmer-labor -> democratic party (one entry in 2012)
     df2.loc[df2['party'] == 'democratic-farmer-labor', 'party'] = 'democrat'
     #tax revolt -> republican party (one entry in 2012)
     df2.loc[df2['party'] == 'tax revolt', 'party'] = 'republican'   
+    
+    #no clear indication which was to cast it, go by candidates closest affiliation between democrat/republican  
+    #independent -> democrat (one entry in 2004 -- bernard sanders)
+    df2.loc[df2['party'] == 'independent', 'party'] = 'democrat' 
+    #reform -> republican (two entires in 2002, 2004 -- henry e. brown jr., 2002 -- barbara dale washer)
+    df2.loc[df2['party'] == 'reform', 'party'] = 'republican'
+    #republican/democrat -> republican (one entry in 2002) -- Don Sherwood
+    df2.loc[df2['party'] == 'republican/democrat', 'party'] = 'republican'
     
     #KS 1.0: republican (tea party) -- might be nan because he ran under republican party ticket but he's actually from tea party?
     #KS 2.0: republican (tea party)
@@ -179,6 +199,8 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
     df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'ND') & (df2['district'] == 1.0), 'party'] = 'republican'
     df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'WY') & (df2['district'] == 1.0), 'party'] = 'republican'
 
+    df2.loc[(pd.isnull(df2['party'])) & (df2['state'] == 'CO') & (df2['district'] == 6.0), 'party'] = 'republican'
+
         
     ########################################## ADDITIONAL PROCESSING W. ASSUMPTIONS ##########################################
     
@@ -208,8 +230,16 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
                     
                     #################### MARGIN FEATURES ####################
                     #convention: when signed, always defined as dem +ve and rep -ve
-                    winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(df1.loc[df1.index == index_tm2, 'totalvotes'].values[0])
-                    loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(df2.loc[df2.index == index_tm2, 'totalvotes'].values[0])
+                    winner_totalvotes = df1.loc[df1.index == index_tm2, 'totalvotes'].values[0]
+                    loser_totalvotes = df2.loc[df2.index == index_tm2, 'totalvotes'].values[0]
+                    if winner_totalvotes == 0:
+                        winner_margin = 1
+                    else:
+                        winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(winner_totalvotes)
+                    if loser_totalvotes == 0:
+                        loser_margin = 1
+                    else:
+                        loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(loser_totalvotes)
 
                     if winner_margin == loser_margin:
                         #only 1 player
