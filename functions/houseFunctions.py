@@ -230,22 +230,57 @@ def fetch_trimmed_data(df1, df2, minYear=2012):
                     
                     #################### MARGIN FEATURES ####################
                     #convention: when signed, always defined as dem +ve and rep -ve
-                    winner_totalvotes = df1.loc[df1.index == index_tm2, 'totalvotes'].values[0]
-                    loser_totalvotes = df2.loc[df2.index == index_tm2, 'totalvotes'].values[0]
+
+
+                    overlap = pickle.load(open('all_overlap_data.p', 'rb'))
+                    pop_map = overlap['population_overlap'] #2014 -> 2012
+
+
+                    all_in = True
+                    for cindex, _ in pop_map[index_t].items():
+                        if cindex not in df1.index:
+                            all_in = False
+
+                    if all_in:
+
+                        winner_totalvotes = 0
+                        winner_votes = 0
+
+                        print(len(pop_map[index_t]))
+
+                        for cindex, cratio in pop_map[index_t].items():
+                            winner_totalvotes += cratio * df1.loc[df1.index == cindex, 'totalvotes'].values[0]
+                            winner_votes += cratio * df1.loc[df1.index == cindex, 'candidatevotes'].values[0]
+                        
+                        loser_totalvotes = 0
+                        loser_votes = 0
+
+                        for cindex, cratio in pop_map[index_t].items():
+                            loser_totalvotes += cratio * df2.loc[df2.index == cindex, 'totalvotes'].values[0]
+                            loser_votes += cratio * df2.loc[df2.index == cindex, 'candidatevotes'].values[0]
+
+                    else:
+                        winner_totalvotes = df1.loc[df1.index == index_tm2, 'totalvotes'].values[0]
+                        loser_totalvotes = df2.loc[df2.index == index_tm2, 'totalvotes'].values[0]
+                        winner_votes = df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0]
+                        loser_votes = df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0]
+
                     if winner_totalvotes == 0:
                         winner_margin = 1
                     else:
-                        winner_margin = (df1.loc[df1.index == index_tm2, 'candidatevotes'].values[0])/(winner_totalvotes)
+                        winner_margin = (winner_votes)/(winner_totalvotes)
                     if loser_totalvotes == 0:
                         loser_margin = 1
                     else:
-                        loser_margin  = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(loser_totalvotes)
+                        loser_margin  = (loser_votes)/(loser_totalvotes)
 
                     if winner_margin == loser_margin:
                         #only 1 player
                         loser_margin = 1e-10
                     else:
                         loser_margin = (df2.loc[df2.index == index_tm2, 'candidatevotes'].values[0])/(df2.loc[df2.index == index_tm2, 'totalvotes'].values[0])                    
+
+
                     ### see convention for 2nd winner when only 1 player ###
 
                     label_dem = 'dem_win_margin_prev'
