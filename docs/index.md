@@ -1,5 +1,4 @@
 
-# Predicting the 2018 Midterm Elections
 *Group 42*
 
 *Elise Penn, Manish Vuyyuru, Yajaira Gonzalez, Victor Sheng*
